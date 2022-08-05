@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Getter
-public class ConfigUtils {
+public class GoogleConfigUtils {
 
 //    @Value("${google.auth.url}")
     private String googleAuthUrl = "https://oauth2.googleapis.com";

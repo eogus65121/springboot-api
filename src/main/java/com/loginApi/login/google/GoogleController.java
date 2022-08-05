@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.loginApi.login.google.constant.ConfigUtils;
+import com.loginApi.login.google.constant.GoogleConfigUtils;
 import com.loginApi.login.google.dto.GoogleLoginDto;
 import com.loginApi.login.google.dto.GoogleLoginReq;
 import com.loginApi.login.google.dto.GoogleLoginRes;
@@ -25,7 +25,7 @@ import java.net.URISyntaxException;
 @RequestMapping(value="/google")
 public class GoogleController {
 
-    private final ConfigUtils configUtils;
+    private final GoogleConfigUtils configUtils;
 
     @GetMapping(value = "/login")
     public ResponseEntity<Object> moveGoogleInitUrl(){
