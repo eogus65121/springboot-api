@@ -15,9 +15,11 @@ public class KaKaoConfigUtils {
 
     private String kakaoRedirectUrl = "http://localhost:8080/kakao/login/redirect";
 
-    private String kakaoAuthUrl = "https://kauth.kakao.com/oauth/authorize";
+    private String kakaoAuthUrl = "https://kauth.kakao.com/oauth/token";
 
-//    private String kakaoLoginUrl = "";
+    private String kakaoLoginUrl = "";
+
+    private String kakaoLoginCheckUrl = "https://kapi.kakao.com/v1/user/access_token_info";
 
     private String kakaoSecret = "iTYu7uQeWDmun0Ib5LJNimSIJiVa20Xa";
 

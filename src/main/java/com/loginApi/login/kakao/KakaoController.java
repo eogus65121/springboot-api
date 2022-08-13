@@ -9,8 +9,11 @@ import com.loginApi.login.kakao.dto.KaKaoLoginDto;
 import com.loginApi.login.kakao.dto.KaKaoLoginReq;
 import com.loginApi.login.kakao.dto.KaKaoLoginRes;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,6 +27,7 @@ import java.net.URISyntaxException;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping(value="/kakao")
+@Slf4j
 public class KakaoController {
 
     private final KaKaoConfigUtils configUtils;
@@ -49,18 +53,27 @@ public class KakaoController {
     public ResponseEntity<KaKaoLoginDto> redirectKakaoLogin(@RequestParam(value = "code") String authCode){
         RestTemplate restTemplate = new RestTemplate();
 
-        KaKaoLoginReq requestParam = KaKaoLoginReq.builder()
-                .grant_type("authorization_code")
-                .client_id(configUtils.getKakaoClientId())
-                .redirect_uri(configUtils.getKakaoRedirectUrl())
-                .code(authCode)
-                .build();
+        MultiValueMap<String, String> reqParams = new LinkedMultiValueMap<>();
+        reqParams.add("grant_type", "authorization_code");
+        reqParams.add("client_id", configUtils.getKakaoClientId());
+        reqParams.add("redirect_uri", configUtils.getKakaoRedirectUrl());
+        reqParams.add("code", authCode);
+        reqParams.add("client_secret", configUtils.getKakaoSecret());
+
+//        KaKaoLoginReq requestParam = KaKaoLoginReq.builder()
+//                .grant_type("authorization_code")
+//                .client_id(configUtils.getKakaoClientId())
+//                .redirect_uri(configUtils.getKakaoRedirectUrl())
+//                .code(authCode)
+////                .client_secret(configUtils.getKakaoSecret())
+//                .build();
 
         try {
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<KaKaoLoginReq> httpEntity = new HttpEntity<>(requestParam);
-            ResponseEntity<String> apiResponseJson = restTemplate.postForEntity(configUtils.getKakaoAuthUrl() + "/token", httpEntity, String.class);
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            HttpEntity httpEntity = new HttpEntity<>(reqParams, headers);
+
+            ResponseEntity<String> apiResponseJson = restTemplate.postForEntity(configUtils.getKakaoAuthUrl(), httpEntity, String.class);
 
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
@@ -68,10 +81,22 @@ public class KakaoController {
             KaKaoLoginRes kakaoLoginResponse = objectMapper.readValue(apiResponseJson.getBody(), new TypeReference<KaKaoLoginRes>() {
             });
 
-            String jwtToken = kakaoLoginResponse.getId_token();
-            String requestUrl = UriComponentsBuilder.fromHttpUrl(configUtils.getKakaoAuthUrl() + "/access_token_info").queryParam("access_token", jwtToken).toUriString();
+//            String jwtToken = kakaoLoginResponse.getId_token();
+            String accessToken = kakaoLoginResponse.getAccess_token();
+            String requestUrl = UriComponentsBuilder.fromHttpUrl(configUtils.getKakaoLoginCheckUrl()).toUriString();
+            String reqToken = "Bearer " + accessToken;
+//            String requestUrl = configUtils.getKakaoLoginCheckUrl();
+            HttpHeaders getHeaders = new HttpHeaders();
+            getHeaders.set("Authorization", reqToken);
+            HttpEntity reqEntity = new HttpEntity<>(headers);
 
-            String resultJson = restTemplate.getForObject(requestUrl, String.class);
+            /** jwtToken, accessToken 발급까지 성공, 이후 GET으로 데이터를 가져오는 과정에서 에러
+             * error message : java.lang.IllegalArgumentException: invalid start or end
+             */
+
+            ResponseEntity<String> respEntity = restTemplate.exchange(requestUrl, HttpMethod.GET, reqEntity, String.class);
+            String resultJson = respEntity.getBody();
+            log.info(resultJson);
 
             if (resultJson != null) {
                 KaKaoLoginDto kakaoInfoDto = objectMapper.readValue(resultJson, new TypeReference<KaKaoLoginDto>() {
