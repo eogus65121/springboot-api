@@ -18,7 +18,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -29,9 +28,7 @@ public class KakaoController {
 
     private final KaKaoConfigUtils configUtils;
 
-    private final WebClient webClient;
-
-    @RequestMapping(value="/oauth/authorize", method = RequestMethod.GET)
+    @RequestMapping(value="/login", method = RequestMethod.GET)
     public ResponseEntity<Object> moveKakaoInitUrl(){
         String authUrl = configUtils.kakaoInitUrl();
         URI redirectUri = null;
