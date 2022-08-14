@@ -5,8 +5,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.loginApi.login.kakao.constant.KaKaoConfigUtils;
-import com.loginApi.login.kakao.dto.KaKaoLoginDto;
-import com.loginApi.login.kakao.dto.KaKaoLoginReq;
 import com.loginApi.login.kakao.dto.KaKaoLoginRes;
 import com.loginApi.login.kakao.dto.KaKaoLoginStatRes;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -61,13 +57,6 @@ public class KakaoController {
         reqParams.add("code", authCode);
         reqParams.add("client_secret", configUtils.getKakaoSecret());
 
-//        KaKaoLoginReq requestParam = KaKaoLoginReq.builder()
-//                .grant_type("authorization_code")
-//                .client_id(configUtils.getKakaoClientId())
-//                .redirect_uri(configUtils.getKakaoRedirectUrl())
-//                .code(authCode)
-////                .client_secret(configUtils.getKakaoSecret())
-//                .build();
 
         try {
             HttpHeaders headers = new HttpHeaders();
@@ -82,10 +71,6 @@ public class KakaoController {
             KaKaoLoginRes kakaoLoginResponse = objectMapper.readValue(apiResponseJson.getBody(), new TypeReference<KaKaoLoginRes>() {
             });
 
-            /** jwtToken, accessToken 발급까지 성공, 이후 GET으로 데이터를 가져오는 과정에서 에러
-             * error message : java.lang.IllegalArgumentException: invalid start or end
-             */
-
             String accessToken = kakaoLoginResponse.getAccess_token();
             String requestUrl = configUtils.getKakaoLoginCheckUrl();
 
@@ -99,8 +84,6 @@ public class KakaoController {
             if (resultJson != null) {
                 KaKaoLoginStatRes kakaoLoginInfo = objectMapper.readValue(resultJson, new TypeReference<KaKaoLoginStatRes>() {
                 });
-
-                log.info("{}", kakaoLoginInfo.toString());
 
                 return ResponseEntity.ok().body(kakaoLoginInfo);
             } else {
