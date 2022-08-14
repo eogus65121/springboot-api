@@ -8,6 +8,7 @@ import com.loginApi.login.kakao.constant.KaKaoConfigUtils;
 import com.loginApi.login.kakao.dto.KaKaoLoginDto;
 import com.loginApi.login.kakao.dto.KaKaoLoginReq;
 import com.loginApi.login.kakao.dto.KaKaoLoginRes;
+import com.loginApi.login.kakao.dto.KaKaoLoginStatRes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -50,7 +51,7 @@ public class KakaoController {
     }
 
     @RequestMapping(value="/login/redirect", method=RequestMethod.GET)
-    public ResponseEntity<KaKaoLoginDto> redirectKakaoLogin(@RequestParam(value = "code") String authCode){
+    public ResponseEntity<KaKaoLoginStatRes> redirectKakaoLogin(@RequestParam(value = "code") String authCode){
         RestTemplate restTemplate = new RestTemplate();
 
         MultiValueMap<String, String> reqParams = new LinkedMultiValueMap<>();
@@ -81,27 +82,27 @@ public class KakaoController {
             KaKaoLoginRes kakaoLoginResponse = objectMapper.readValue(apiResponseJson.getBody(), new TypeReference<KaKaoLoginRes>() {
             });
 
-//            String jwtToken = kakaoLoginResponse.getId_token();
-            String accessToken = kakaoLoginResponse.getAccess_token();
-            String requestUrl = UriComponentsBuilder.fromHttpUrl(configUtils.getKakaoLoginCheckUrl()).toUriString();
-            String reqToken = "Bearer " + accessToken;
-//            String requestUrl = configUtils.getKakaoLoginCheckUrl();
-            HttpHeaders getHeaders = new HttpHeaders();
-            getHeaders.set("Authorization", reqToken);
-            HttpEntity reqEntity = new HttpEntity<>(headers);
-
             /** jwtToken, accessToken 발급까지 성공, 이후 GET으로 데이터를 가져오는 과정에서 에러
              * error message : java.lang.IllegalArgumentException: invalid start or end
              */
 
-            ResponseEntity<String> respEntity = restTemplate.exchange(requestUrl, HttpMethod.GET, reqEntity, String.class);
-            String resultJson = respEntity.getBody();
-            log.info(resultJson);
+            String accessToken = kakaoLoginResponse.getAccess_token();
+            String requestUrl = configUtils.getKakaoLoginCheckUrl();
+
+            HttpHeaders getHeader = new HttpHeaders();
+            getHeader.set("Authorization", "Bearer " + accessToken);
+            HttpEntity entity = new HttpEntity<>(getHeader);
+
+            ResponseEntity<String> responseEntity = restTemplate.exchange(requestUrl, HttpMethod.GET, entity, String.class);
+            String resultJson = responseEntity.getBody();
 
             if (resultJson != null) {
-                KaKaoLoginDto kakaoInfoDto = objectMapper.readValue(resultJson, new TypeReference<KaKaoLoginDto>() {
+                KaKaoLoginStatRes kakaoLoginInfo = objectMapper.readValue(resultJson, new TypeReference<KaKaoLoginStatRes>() {
                 });
-                return ResponseEntity.ok().body(kakaoInfoDto);
+
+                log.info("{}", kakaoLoginInfo.toString());
+
+                return ResponseEntity.ok().body(kakaoLoginInfo);
             } else {
                 throw new Exception("kakao oauth fail");
             }
