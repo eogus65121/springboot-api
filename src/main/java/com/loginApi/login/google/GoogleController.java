@@ -36,6 +36,10 @@ public class GoogleController {
             redirectUri = new URI(authUrl);
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.setLocation(redirectUri);
+            /**
+             HttpStatus.SEE_OTHER == code 303
+             code 303 == 요청자가 다른 위치에 별도의 GET 요청을 하여 응답을 검색할 경우 서버는 이 코드를 표시한다. HEAD 요청 이외의 모든 요청을 다른 위치로 자동으로 전달한다
+             */
             return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
         }catch(URISyntaxException e){
             e.printStackTrace();
