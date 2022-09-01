@@ -1,6 +1,7 @@
 package com.loginApi.login.google.constant;
 
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -11,23 +12,23 @@ import java.util.stream.Collectors;
 @Getter
 public class GoogleConfigUtils {
 
-//    @Value("${google.auth.url}")
-    private String googleAuthUrl = "https://oauth2.googleapis.com";
+    @Value("${google.auth.url}")
+    private String googleAuthUrl;
 
-//    @Value("${google.login.url}")
-    private String googleLoginUrl = "https://accounts.google.com";
+    @Value("${google.login.url}")
+    private String googleLoginUrl;
 
-//    @Value("${google.redirect.uri}")
-    private String googleRedirectUrl = "http://localhost:8080/google/login/redirect";
+    @Value("${google.redirect.uri}")
+    private String googleRedirectUrl;
 
-//    @Value("${google.client.id}")
-    private String googleClientId = "317022284825-dao0e67kivhlkrtihcm637fj8cpcsa6g.apps.googleusercontent.com";
+    @Value("${google.client.id}")
+    private String googleClientId;
 
-//    @Value("${google.secret}")
-    private String googleSecret = "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";
+    @Value("${google.secret}")
+    private String googleSecret;
 
-//    @Value("${google.auth.scope}")
-    private String scopes = "profile,email,openid";
+    @Value("${google.auth.scope}")
+    private String scopes;
 
     public String googleInitUrl(){
         Map<String, Object> params = new HashMap<>();
