@@ -1,13 +1,12 @@
 package com.loginApi.login.google.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @ToString
 @Getter @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class GoogleLoginRes {
     private String accessToken;
     private String expiresIn;   // access token의 남은 수명
