@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class GoogleControllerTest {
 
-    @Autowired
+    @Autowired(required = false)
     private MockMvc mockMvc;
 
     @Test
