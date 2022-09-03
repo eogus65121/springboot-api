@@ -2,6 +2,7 @@ package com.loginApi.login.kakao.constant;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -11,24 +12,30 @@ import java.util.Map;
 @Component
 public class KaKaoConfigUtils {
 
-    private String kakaoClientId = "2f4e81007fe7b19f83060d1b69eab93e";
+    @Value("${kakao.client.id}")
+    private String kakaoClientId;
 
-    private String kakaoRedirectUrl = "http://localhost:8080/kakao/login/redirect";
+    @Value("${kakao.redirect.url}")
+    private String kakaoRedirectUrl;
 
-    private String kakaoAuthUrl = "https://kauth.kakao.com/oauth/token";
+    @Value("${kakao.auth.url}")
+    private String kakaoAuthUrl;
 
-    private String kakaoLoginUrl = "";
+    @Value("${kakao.login.url}")
+    private String kakaoLoginUrl;
 
-    private String kakaoLoginCheckUrl = "https://kapi.kakao.com/v1/user/access_token_info";
+    @Value("${kakao.login.check.url}")
+    private String kakaoLoginCheckUrl;
 
-    private String kakaoSecret = "iTYu7uQeWDmun0Ib5LJNimSIJiVa20Xa";
+    @Value("${kakao.secret}")
+    private String kakaoSecret;
 
     public String kakaoInitUrl(){
         Map<String, Object> params = new HashMap<>();
         params.put("client_id", getKakaoClientId());
         params.put("redirect_uri", getKakaoRedirectUrl());
         params.put("response_type", "code");
-        String paramStr = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=" + params.get("client_id")
+        String paramStr = kakaoLoginUrl + params.get("client_id")
                 + "&redirect_uri=" + params.get("redirect_uri") + "&response_type=" +params.get("response_type");
         return paramStr;
     }
