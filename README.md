@@ -3,6 +3,6 @@
 ### Login API
 - Google : Completion
 - Kakao : Completion
-- Naver: 
+- Naver: Completion
 
 ### Payment API
